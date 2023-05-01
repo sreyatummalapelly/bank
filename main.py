@@ -1,61 +1,17 @@
 import mysql.connector
 
-def display_welcome_message():
-    print("Welcome to the Online Banking System!")
-    print("************************************\n")
-
-def display_menu():
-    print("Please select an option:")
-    print("1. Check Balance")
-    print("2. Deposit")
-    print("3. Withdraw")
-    print("4. Create Account")
-    print("5. Close Account")
-    print("6. Modify Account")
-    print("0. Exit")
-
-def main():
-    display_welcome_message()
-
-    while True:
-        display_menu()
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            # Perform check balance operation
-            print("Check Balance selected.\n")
-        elif choice == "2":
-            # Perform deposit operation
-            print("Deposit selected.\n")
-        elif choice == "3":
-            # Perform withdraw operation
-            print("Withdraw selected.\n")
-        elif choice == "4":
-            # Perform create account operation
-            print("Create Account selected.\n")
-        elif choice == "5":
-            # Perform close account operation
-            print("Close Account selected.\n")
-        elif choice == "6":
-            # Perform modify account operation
-            print("Modify Account selected.\n")
-        elif choice == "0":
-            print("Thank you for using the Online Banking System. Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please try again.\n")
-
 # Establish a connection to the MySQL database
 connection = mysql.connector.connect(
     host="localhost",
-    user="your_username",
-    password="your_password",
+    user ="root",
+    password="Password!123",
     database="banking_app"
 )
 
+
 def check_balance(account_number):
     cursor = connection.cursor()
-    query = "SELECT balance FROM accounts WHERE account_number = %s"
+    query = 'SELECT balance FROM accounts WHERE account_number = %s'
     params = (account_number,)
     cursor.execute(query, params)
     result = cursor.fetchone()
@@ -67,10 +23,9 @@ def check_balance(account_number):
 
     cursor.close()
 
-
 def deposit(account_number, amount):
     cursor = connection.cursor()
-    query = "UPDATE accounts SET balance = balance + %s WHERE account_number = %s"
+    query = 'UPDATE accounts SET balance = balance + %s WHERE account_number = %s'
     params = (amount, account_number)
     cursor.execute(query, params)
     connection.commit()
@@ -84,7 +39,7 @@ def deposit(account_number, amount):
 
 def withdraw(account_number, amount):
     cursor = connection.cursor()
-    query = "UPDATE accounts SET balance = balance - %s WHERE account_number = %s AND balance >= %s"
+    query = 'UPDATE accounts SET balance = balance - %s WHERE account_number = %s AND balance >= %s'
     params = (amount, account_number, amount)
     cursor.execute(query, params)
     connection.commit()
@@ -98,7 +53,7 @@ def withdraw(account_number, amount):
 
 def create_account(pin, name, initial_balance):
     cursor = connection.cursor()
-    query = "INSERT INTO accounts (pin, name, balance) VALUES (%s, %s, %s)"
+    query = 'INSERT INTO accounts (pin, name, balance) VALUES (%s, %s, %s)'
     params = (pin, name, initial_balance)
     cursor.execute(query, params)
     connection.commit()
@@ -110,7 +65,7 @@ def create_account(pin, name, initial_balance):
 
 def delete_account(account_number):
     cursor = connection.cursor()
-    query = "DELETE FROM accounts WHERE account_number = %s"
+    query = 'DELETE FROM accounts WHERE account_number = %s'
     params = (account_number,)
     cursor.execute(query, params)
     connection.commit()
@@ -124,7 +79,7 @@ def delete_account(account_number):
 
 def modify_account(account_number, name=None, pin=None):
     cursor = connection.cursor()
-    query = "UPDATE accounts SET"
+    query = 'UPDATE accounts SET'
     params = []
 
     if name:
@@ -155,6 +110,49 @@ def modify_account(account_number, name=None, pin=None):
 
     cursor.close()
 
+# Main function to handle user input
+def main():
+    while True:
+        print("Welcome to the Banking App!")
+        print("1. Check Balance")
+        print("2. Deposit")
+        print("3. Withdraw")
+        print("4. Create Account")
+        print("5. Delete Account")
+        print("6. Modify Account")
+        print("0. Exit")
+        choice = input("Enter your choice: ")
 
+        if choice == "1":
+            account_number = input("Enter account number: ")
+            check_balance(account_number)
+        elif choice == "2":
+            account_number = input("Enter account number: ")
+            amount = float(input("Enter deposit amount: "))
+            deposit(account_number, amount)
+        elif choice == "3":
+            account_number = input("Enter account number: ")
+            amount = float(input("Enter withdrawal amount: "))
+            withdraw(account_number, amount)
+        elif choice == "4":
+            pin = int(input("Enter PIN: "))
+            name = input("Enter account holder's name: ")
+            initial_balance = float(input("Enter initial balance: "))
+            create_account(pin, name, initial_balance)
+        elif choice == "5":
+            account_number = input("Enter account number: ")
+            delete_account(account_number)
+        elif choice == "6":
+            account_number = input("Enter account number: ")
+            name = input("Enter new name (press enter to skip): ")
+            pin = input("Enter new PIN (press enter to skip): ")
+            modify_account(account_number, name, pin)
+        elif choice == "0":
+            print("Thank you for using the Banking App. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the main function
 if __name__ == "__main__":
     main()
